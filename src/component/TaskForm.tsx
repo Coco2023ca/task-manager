@@ -2,11 +2,12 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import categories from '../categories'; // Import your categories file
+import moment from "moment";
 
 interface Task {
     id:number;
     title: string;
-    dueDate: string;
+    dueDate: Date;
     category: string;
   }
 
@@ -19,52 +20,53 @@ const validationSchema = Yup.object().shape({
     id:Yup.number().required('Task ID'),
     title: Yup.string()
       .required('Task Title is required'),
-    dueDate: Yup.string()
-      .required('Due date is required')
-      .matches(
-        /^\d{4}-\d{2}-\d{2}$/, // Regular expression for "yyyy-MM-dd" format
-        'Due date must be in the "yyyy-MM-dd" format'
-      ),
+    dueDate: Yup.date()
+      .required('Due date is required'),
     category: Yup.string()
       .oneOf(categories, 'Invalid category')
       .required('Category is required'),
   });
+  
+ 
 
-  const initialValues = {
-    id:0,
-    title: '',
-    dueDate: '',
-    category: '',
-  };
   
     return (
       <Formik
-        initialValues={initialValues}
+        initialValues={{ 
+          id:moment().unix(),
+          title: '',
+          dueDate: moment().format("YYYY-MM-DD"),
+          category: '',
+      }}
         validationSchema={validationSchema}
         onSubmit={(values, { resetForm }) => {
-            const newTask: Task = {
-                ...values,
-                dueDate: values.dueDate,
-              };
-            addTask(newTask);
+
+            const newvalues ={
+                id:moment().unix(),
+                title: values.title,
+                dueDate: moment(values.dueDate).toDate(),
+                category: values.category,
+            }
+            
+            addTask(newvalues);
            resetForm(); // Clear the form after submission
         }}
       >
         <Form>
           <div>
-            <label htmlFor="title">Title</label>
+            <label htmlFor="title">Title : </label>
             <Field type="text" id="title" name="title" />
             <ErrorMessage name="title" component="div" className="error" />
           </div>
   
           <div>
-            <label htmlFor="dueDate">Due Date</label>
+            <label htmlFor="dueDate">Due Date : </label>
             <Field type="date" id="dueDate" name="dueDate" />
             <ErrorMessage name="dueDate" component="div" className="error" />
           </div>
   
           <div>
-            <label htmlFor="category">Category</label>
+            <label htmlFor="category">Category : </label>
             <Field as="select" id="category" name="category">
               <option value="">Select a category</option>
               {categories.map((category) => (

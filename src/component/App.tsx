@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
+import '../App.css';
 
 interface Task {
     id:number;
     title: string;
-    dueDate: string;
+    dueDate: Date;
     category: string;
   }
 
